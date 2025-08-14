@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart of Astronomy History 1800-1950</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e5e0 100%);
+            min-height: 100vh;
+        }
+        
+        .chart-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: #fefdfb;
+            border: 3px solid #8b7355;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow-x: auto;
+        }
+        
+        .chart-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #4a3c28;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .chart-subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #6b5d4a;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .filter-panel {
+            background: rgba(255, 248, 240, 0.95);
+            border: 2px solid #d4af7a;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 25px;
+            align-items: start;
+            min-height: 60px;
+        }
+
+        .filter-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-categories > label {
+            font-weight: bold;
+            color: #4a3c28;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .category-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .category-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 11px;
+            padding: 2px;
+        }
+
+        .category-checkbox input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+            transform: scale(0.9);
+            flex-shrink: 0;
+        }
+
+        .category-indicator {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .category-checkbox label {
+            cursor: pointer;
+            color: #4a3c28;
+            font-size: 11px;
+        }
+
+        .filter-main {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 300px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: bold;
+            color: #4a3c28;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .filter-input {
+            padding: 6px 10px;
+            border: 2px solid #d4af7a;
+            border-radius: 5px;
+            background: #fff;
+            color: #4a3c28;
+            font-family: inherit;
+            font-size: 12px;
+            width: 120px;
+        }
+
+        .filter-input.name-search {
+            width: 180px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #8b7355;
+            box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.2);
+        }
+
+        .time-range-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .time-slider {
+            width: 100px;
+            height: 4px;
+            border-radius: 2px;
+            background: #d4af7a;
+            outline: none;
+            appearance: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #8b7355;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .time-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #8b7355;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .filter-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-stats {
+            background: rgba(139, 115, 85, 0.1);
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            color: #4a3c28;
+            font-style: italic;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .clear-filters {
+            background: #8b7355;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 11px;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .clear-filters:hover {
+            background: #6d5a42;
+        }
+
+        .timeline-container {
+            position: relative;
+            margin: 40px 0;
+            width: 1600px;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline-container.filtering {
+            opacity: 0.7;
+        }
+        
+        .time-axis {
+            position: absolute;
+            top: 50px;
+            bottom: 50px;
+            left: 50px;
+            right: 50px;
+            border-top: 3px solid #8b7355;
+            border-bottom: 3px solid #8b7355;
+        }
+        
+        .year-marker {
+            position: absolute;
+            top: -15px;
+            bottom: -30px;
+            width: 2px;
+            background: #8b7355;
+            font-size: 14px;
+            color: #4a3c28;
+            font-weight: bold;
+        }
+        
+        .year-label {
+            position: absolute;
+            top: -12px;
+            left: -25px;
+            background: #fefdfb;
+            padding: 1px 4px;
+            white-space: nowrap;
+            border: 1px solid #d4af7a;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        .astronomer-entry {
+            position: absolute;
+            height: 70px;
+            padding: 8px;
+            background: rgba(255, 248, 240, 0.95);
+            border: 2px solid #d4af7a;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        .astronomer-entry.filtered-out {
+            opacity: 0.15;
+            transform: scale(0.95);
+            pointer-events: none;
+            filter: grayscale(0.8);
+        }
+
+        .astronomer-entry.highlighted {
+            box-shadow: 0 0 0 3px rgba(212, 175, 122, 0.6);
+            z-index: 50;
+        }
+        
+        .astronomer-entry:hover:not(.filtered-out) {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        
+        .astronomer-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #4a3c28;
+            margin-bottom: 2px;
+            border-bottom: 1px solid #d4af7a;
+            padding-bottom: 1px;
+        }
+        
+        .astronomer-dates {
+            font-size: 9px;
+            color: #8b7355;
+            margin-bottom: 4px;
+            font-style: italic;
+        }
+        
+        .book-list {
+            font-size: 10px;
+            line-height: 1.2;
+            flex-grow: 1;
+            overflow: visible;
+            position: relative;
+        }
+        
+        .publication-marker {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #8b7355;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .publication-marker:hover {
+            transform: scale(1.4);
+            background: #d4af7a;
+            z-index: 200;
+        }
+        
+        .publication-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(75, 60, 40, 0.95);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        
+        .publication-marker:hover .publication-label {
+            opacity: 1;
+        }
+        
+        .publication-title-label {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(75, 60, 40, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            font-style: italic;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            max-width: 200px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .publication-marker:hover .publication-title-label {
+            opacity: 1;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 248, 240, 0.95);
+            border: 2px solid #d4af7a;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+            color: #4a3c28;
+        }
+        
+        .category-observer { border-left: 5px solid #c0392b; }
+        .category-theorist { border-left: 5px solid #2980b9; }
+        .category-popularizer { border-left: 5px solid #27ae60; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b7355;
+            font-style: italic;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #c0392b;
+            background: #ffe6e6;
+            border-radius: 8px;
+            margin: 20px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #8b7355;
+            font-style: italic;
+            background: rgba(139, 115, 85, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .filter-panel {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .time-range-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            
+            .category-checkboxes {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <div class="chart-title" id="chartTitle">Loading...</div>
+        <div class="chart-subtitle" id="chartSubtitle"></div>
+        
+        <div id="loadingMessage" class="loading">Loading astronomy data...</div>
+        
+        <div class="filter-panel" id="filterPanel" style="display: none;">
+            <div class="filter-categories">
+                <label>Categories:</label>
+                <div class="category-checkboxes" id="categoryCheckboxes">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+            
+            <div class="filter-main">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="nameSearch">Search Name:</label>
+                        <input type="text" id="nameSearch" class="filter-input name-search" placeholder="Enter astronomer name...">
+                    </div>
+                </div>
+                
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Time Period:</label>
+                        <div class="time-range-container">
+                            <input type="range" id="yearStartSlider" class="time-slider" min="1700" max="2000" step="5">
+                            <input type="number" id="yearStart" class="filter-input" placeholder="Start" style="width: 60px;">
+                            <span style="font-size: 11px; color: #8b7355;">to</span>
+                            <input type="range" id="yearEndSlider" class="time-slider" min="1700" max="2000" step="5">
+                            <input type="number" id="yearEnd" class="filter-input" placeholder="End" style="width: 60px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <div class="filter-stats" id="filterStats">
+                    Showing all astronomers
+                </div>
+                <button class="clear-filters" id="clearFilters">Clear Filters</button>
+            </div>
+        </div>
+        
+        <div class="timeline-container" id="timelineContainer" style="display: none;">
+            <!-- Content will be dynamically generated -->
+            <div class="time-axis"></div>
+            <div id="yearMarkers"></div>
+            <div id="astronomers"></div>
+        </div>
+        
+        <div id="noResults" class="no-results" style="display: none;">
+            No astronomers match the current filters. Try adjusting your search criteria.
+        </div>
+        
+        <div class="legend" id="legend" style="display: none;">
+            <!-- Legend will be dynamically generated -->
+        </div>
+    </div>
+
+    <script>
+        // Fallback data
+        const FALLBACK_DATA = {
+          "metadata": {
+            "title": "A Chart of Astronomical History",
+            "subtitle": "Principal Astronomers and Their Literary Contributions",
+            "scale": {
+              "pixelsPerYear": 10,
+              "baseLeft": 50
+            }
+          },
+          "categories": {
+            "observer": {
+              "name": "Observers & Discoverers",
+              "color": "#c0392b",
+              "className": "category-observer"
+            },
+            "theorist": {
+              "name": "Theorists & Mathematicians", 
+              "color": "#2980b9",
+              "className": "category-theorist"
+            },
+            "popularizer": {
+              "name": "Popular Science Writers",
+              "color": "#27ae60", 
+              "className": "category-popularizer"
+            }
+          },
+          "astronomers": [
+            {
+              "name": "William Herschel",
+              "birthYear": 1738,
+              "deathYear": 1822,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1802,
+                  "title": "Catalogue of Nebulae and Clusters"
+                },
+                {
+                  "year": 1811,
+                  "title": "On the Nature of the Sun"
+                }
+              ]
+            },
+            {
+              "name": "Mary Somerville",
+              "birthYear": 1780,
+              "deathYear": 1872,
+              "category": "popularizer",
+              "publications": [
+                {
+                  "year": 1831,
+                  "title": "The Mechanism of the Heavens"
+                },
+                {
+                  "year": 1848,
+                  "title": "Physical Geography"
+                }
+              ]
+            },
+            {
+              "name": "Friedrich Bessel",
+              "birthYear": 1784,
+              "deathYear": 1846,
+              "category": "theorist",
+              "publications": [
+                {
+                  "year": 1818,
+                  "title": "Fundamenta Astronomiae"
+                },
+                {
+                  "year": 1838,
+                  "title": "On Stellar Parallax"
+                }
+              ]
+            },
+            {
+              "name": "John Herschel",
+              "birthYear": 1792,
+              "deathYear": 1871,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1833,
+                  "title": "A Treatise on Astronomy"
+                },
+                {
+                  "year": 1847,
+                  "title": "Results of Observations"
+                }
+              ]
+            },
+            {
+              "name": "Urbain Le Verrier",
+              "birthYear": 1811,
+              "deathYear": 1877,
+              "category": "theorist",
+              "publications": [
+                {
+                  "year": 1846,
+                  "title": "Recherches sur Uranus"
+                },
+                {
+                  "year": 1859,
+                  "title": "Théorie de Mercure"
+                }
+              ]
+            },
+            {
+              "name": "Giovanni Schiaparelli",
+              "birthYear": 1835,
+              "deathYear": 1910,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1877,
+                  "title": "Osservazioni del pianeta Marte"
+                },
+                {
+                  "year": 1895,
+                  "title": "La vita sul pianeta Marte"
+                }
+              ]
+            },
+            {
+              "name": "Richard A. Proctor",
+              "birthYear": 1837,
+              "deathYear": 1888,
+              "category": "popularizer",
+              "publications": [
+                {
+                  "year": 1870,
+                  "title": "Other Worlds Than Ours"
+                },
+                {
+                  "year": 1878,
+                  "title": "Myths and Marvels"
+                }
+              ]
+            },
+            {
+              "name": "Agnes M. Clerke",
+              "birthYear": 1842,
+              "deathYear": 1907,
+              "category": "popularizer",
+              "publications": [
+                {
+                  "year": 1885,
+                  "title": "Popular History of Astronomy"
+                },
+                {
+                  "year": 1890,
+                  "title": "The System of the Stars"
+                }
+              ]
+            },
+            {
+              "name": "Percival Lowell",
+              "birthYear": 1855,
+              "deathYear": 1916,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1895,
+                  "title": "Mars"
+                },
+                {
+                  "year": 1906,
+                  "title": "Mars and Its Canals"
+                }
+              ]
+            },
+            {
+              "name": "Annie Jump Cannon",
+              "birthYear": 1863,
+              "deathYear": 1941,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1901,
+                  "title": "Spectra of Southern Stars"
+                },
+                {
+                  "year": 1918,
+                  "title": "Henry Draper Catalogue"
+                }
+              ]
+            },
+            {
+              "name": "George Ellery Hale",
+              "birthYear": 1868,
+              "deathYear": 1938,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1908,
+                  "title": "Study of Stellar Evolution"
+                },
+                {
+                  "year": 1922,
+                  "title": "The New Heavens"
+                }
+              ]
+            },
+            {
+              "name": "Arthur Eddington",
+              "birthYear": 1882,
+              "deathYear": 1944,
+              "category": "theorist",
+              "publications": [
+                {
+                  "year": 1920,
+                  "title": "Space, Time and Gravitation"
+                },
+                {
+                  "year": 1926,
+                  "title": "Internal Constitution of Stars"
+                }
+              ]
+            },
+            {
+              "name": "Edwin Hubble",
+              "birthYear": 1889,
+              "deathYear": 1953,
+              "category": "observer",
+              "publications": [
+                {
+                  "year": 1929,
+                  "title": "Distance & Radial Velocity"
+                },
+                {
+                  "year": 1936,
+                  "title": "The Realm of the Nebulae"
+                }
+              ]
+            },
+            {
+              "name": "Cecilia Payne-Gaposchkin",
+              "birthYear": 1900,
+              "deathYear": 1979,
+              "category": "theorist",
+              "publications": [
+                {
+                  "year": 1925,
+                  "title": "Stellar Atmospheres"
+                },
+                {
+                  "year": 1930,
+                  "title": "Stars of High Luminosity"
+                }
+              ]
+            }
+          ]
+        };
+
+        // Global data object
+        let chartData = null;
+        let timeRange = null;
+        let sortedAstronomers = null;
+        let currentFilters = {
+            nameSearch: '',
+            yearStart: null,
+            yearEnd: null,
+            categories: new Set()
+        };
+
+        // Calculate dynamic time range based on birth and death years
+        function calculateTimeRange(astronomers) {
+            const birthYears = astronomers.map(a => a.birthYear);
+            const deathYears = astronomers.map(a => a.deathYear);
+            
+            const minYear = Math.min(...birthYears);
+            const maxYear = Math.max(...deathYears);
+            
+            // Add some padding to make it look nice
+            const padding = 10;
+            const start = Math.floor((minYear - padding) / 10) * 10; // Round down to nearest 10
+            const end = Math.ceil((maxYear + padding) / 10) * 10;   // Round up to nearest 10
+            
+            return { start, end };
+        }
+
+        // Sort astronomers by birth year and assign row positions
+        function sortAndAssignRows(astronomers) {
+            return astronomers
+                .sort((a, b) => a.birthYear - b.birthYear)
+                .map((astronomer, index) => ({
+                    ...astronomer,
+                    row: index + 1
+                }));
+        }
+
+        // Filter astronomers based on current filters
+        function filterAstronomers(astronomers) {
+            return astronomers.filter(astronomer => {
+                // Name search filter
+                if (currentFilters.nameSearch) {
+                    const nameMatch = astronomer.name.toLowerCase().includes(currentFilters.nameSearch.toLowerCase());
+                    if (!nameMatch) return false;
+                }
+                
+                // Category filter
+                if (currentFilters.categories.size > 0) {
+                    if (!currentFilters.categories.has(astronomer.category)) return false;
+                }
+                
+                // Year range filter
+                if (currentFilters.yearStart !== null && !isNaN(currentFilters.yearStart)) {
+                    if (astronomer.deathYear < currentFilters.yearStart) return false;
+                }
+                
+                if (currentFilters.yearEnd !== null && !isNaN(currentFilters.yearEnd)) {
+                    if (astronomer.birthYear > currentFilters.yearEnd) return false;
+                }
+                
+                return true;
+            });
+        }
+
+        // Load the astronomy data with fallback
+        async function loadAstronomyData() {
+            console.log('Loading astronomy data...');
+            // Use embedded fallback data
+            chartData = FALLBACK_DATA;
+            
+            // Initialize all categories as selected by default
+            Object.keys(chartData.categories).forEach(category => {
+                currentFilters.categories.add(category);
+            });
+            
+            // Process the data
+            timeRange = calculateTimeRange(chartData.astronomers);
+            sortedAstronomers = sortAndAssignRows(chartData.astronomers);
+            
+            // Update the subtitle with the calculated date range
+            chartData.metadata.subtitle = `Principal Astronomers and Their Literary Contributions, ${timeRange.start}-${timeRange.end}`;
+            
+            renderChart();
+            setupFilters();
+        }
+
+        // Setup filter controls
+        function setupFilters() {
+            console.log('Setting up filters...');
+            // Show filter panel
+            document.getElementById('filterPanel').style.display = 'grid';
+            
+            // Setup category checkboxes
+            const categoryContainer = document.getElementById('categoryCheckboxes');
+            categoryContainer.innerHTML = ''; // Clear existing content
+            
+            Object.entries(chartData.categories).forEach(([key, category]) => {
+                const checkbox = document.createElement('div');
+                checkbox.className = 'category-checkbox';
+                checkbox.innerHTML = `
+                    <input type="checkbox" id="cat-${key}" checked>
+                    <div class="category-indicator" style="background: ${category.color};"></div>
+                    <label for="cat-${key}">${category.name}</label>
+                `;
+                categoryContainer.appendChild(checkbox);
+                
+                // Add event listener
+                const input = checkbox.querySelector('input');
+                input.addEventListener('change', () => {
+                    console.log(`Category ${key} changed:`, input.checked);
+                    if (input.checked) {
+                        currentFilters.categories.add(key);
+                    } else {
+                        currentFilters.categories.delete(key);
+                    }
+                    applyFilters();
+                });
+            });
+            
+            // Setup name search
+            const nameSearchInput = document.getElementById('nameSearch');
+            nameSearchInput.addEventListener('input', (e) => {
+                console.log('Name search changed:', e.target.value);
+                currentFilters.nameSearch = e.target.value.trim();
+                applyFilters();
+            });
+            
+            // Setup year range sliders and inputs
+            const yearStartSlider = document.getElementById('yearStartSlider');
+            const yearEndSlider = document.getElementById('yearEndSlider');
+            const yearStartInput = document.getElementById('yearStart');
+            const yearEndInput = document.getElementById('yearEnd');
+            
+            // Set slider ranges based on data
+            yearStartSlider.min = timeRange.start;
+            yearStartSlider.max = timeRange.end;
+            yearStartSlider.value = timeRange.start;
+            yearEndSlider.min = timeRange.start;
+            yearEndSlider.max = timeRange.end;
+            yearEndSlider.value = timeRange.end;
+            
+            // Sync sliders with inputs
+            yearStartSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                console.log('Year start slider changed:', value);
+                yearStartInput.value = value;
+                currentFilters.yearStart = value;
+                applyFilters();
+            });
+            
+            yearEndSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                console.log('Year end slider changed:', value);
+                yearEndInput.value = value;
+                currentFilters.yearEnd = value;
+                applyFilters();
+            });
+            
+            // Sync inputs with sliders
+            yearStartInput.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                console.log('Year start input changed:', value);
+                if (!isNaN(value) && value >= timeRange.start && value <= timeRange.end) {
+                    yearStartSlider.value = value;
+                    currentFilters.yearStart = value;
+                } else if (e.target.value === '') {
+                    currentFilters.yearStart = null;
+                }
+                applyFilters();
+            });
+            
+            yearEndInput.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                console.log('Year end input changed:', value);
+                if (!isNaN(value) && value >= timeRange.start && value <= timeRange.end) {
+                    yearEndSlider.value = value;
+                    currentFilters.yearEnd = value;
+                } else if (e.target.value === '') {
+                    currentFilters.yearEnd = null;
+                }
+                applyFilters();
+            });
+            
+            // Setup clear filters button
+            document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+            
+            // Set initial placeholder values for year inputs
+            yearStartInput.placeholder = timeRange.start;
+            yearEndInput.placeholder = timeRange.end;
+            
+            // Initial filter stats
+            updateFilterStats();
+        }
+
+        // Apply current filters
+        function applyFilters() {
+            console.log('Applying filters:', currentFilters);
+            const timelineContainer = document.getElementById('timelineContainer');
+            const noResults = document.getElementById('noResults');
+            
+            timelineContainer.classList.add('filtering');
+            
+            setTimeout(() => {
+                const filteredAstronomers = filterAstronomers(chartData.astronomers);
+                console.log('Filtered astronomers:', filteredAstronomers.length);
+                
+                if (filteredAstronomers.length === 0) {
+                    timelineContainer.style.display = 'none';
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                    timelineContainer.style.display = 'block';
+                    
+                    // Update visibility of astronomer entries
+                    document.querySelectorAll('.astronomer-entry').forEach((entry, index) => {
+                        const astronomer = sortedAstronomers[index];
+                        const isVisible = filteredAstronomers.some(fa => fa.name === astronomer.name);
+                        
+                        if (isVisible) {
+                            entry.classList.remove('filtered-out');
+                            // Add highlight if name search matches
+                            if (currentFilters.nameSearch && 
+                                astronomer.name.toLowerCase().includes(currentFilters.nameSearch.toLowerCase())) {
+                                entry.classList.add('highlighted');
+                            } else {
+                                entry.classList.remove('highlighted');
+                            }
+                        } else {
+                            entry.classList.add('filtered-out');
+                            entry.classList.remove('highlighted');
+                        }
+                    });
+                }
+                
+                updateFilterStats();
+                timelineContainer.classList.remove('filtering');
+            }, 150);
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            console.log('Clearing all filters');
+            // Reset filter state
+            currentFilters = {
+                nameSearch: '',
+                yearStart: null,
+                yearEnd: null,
+                categories: new Set(Object.keys(chartData.categories))
+            };
+            
+            // Reset UI controls
+            document.getElementById('nameSearch').value = '';
+            document.getElementById('yearStart').value = '';
+            document.getElementById('yearEnd').value = '';
+            document.getElementById('yearStartSlider').value = timeRange.start;
+            document.getElementById('yearEndSlider').value = timeRange.end;
+            
+            // Reset checkboxes
+            document.querySelectorAll('.category-checkbox input').forEach(input => {
+                input.checked = true;
+            });
+            
+            // Apply filters (which will show everything)
+            applyFilters();
+        }
+
+        // Update filter statistics
+        function updateFilterStats() {
+            const filteredCount = filterAstronomers(chartData.astronomers).length;
+            const totalCount = chartData.astronomers.length;
+            
+            const statsElement = document.getElementById('filterStats');
+            
+            if (filteredCount === totalCount) {
+                statsElement.textContent = `Showing all ${totalCount} astronomers`;
+            } else {
+                statsElement.textContent = `Showing ${filteredCount} of ${totalCount} astronomers`;
+            }
+        }
+
+        // Calculate position and width for astronomers
+        function calculateAstronomerLayout(astronomer) {
+            const { birthYear, deathYear } = astronomer;
+            const { scale } = chartData.metadata;
+            
+            // Calculate position relative to chart start
+            const left = scale.baseLeft + (birthYear - timeRange.start) * scale.pixelsPerYear;
+            
+            // Calculate width (lifespan)
+            const lifespan = deathYear - birthYear;
+            const width = lifespan * scale.pixelsPerYear;
+            
+            return { left, width };
+        }
+
+        // Generate year markers
+        function generateYearMarkers() {
+            const container = document.getElementById('yearMarkers');
+            container.innerHTML = ''; // Clear existing content
+            const { scale } = chartData.metadata;
+            
+            // Calculate appropriate interval based on time range
+            const yearSpan = timeRange.end - timeRange.start;
+            let interval = 10;
+            if (yearSpan > 200) interval = 25;
+            else if (yearSpan > 100) interval = 15;
+            else if (yearSpan < 50) interval = 5;
+            
+            // Generate markers
+            for (let year = Math.ceil(timeRange.start / interval) * interval; year <= timeRange.end; year += interval) {
+                const left = scale.baseLeft + (year - timeRange.start) * scale.pixelsPerYear;
+                
+                const marker = document.createElement('div');
+                marker.className = 'year-marker';
+                marker.style.left = left + 'px';
+                
+                const label = document.createElement('div');
+                label.className = 'year-label';
+                label.textContent = year;
+                marker.appendChild(label);
+                
+                container.appendChild(marker);
+            }
+        }
+
+        // Calculate position for publication markers
+        function calculatePublicationPosition(publicationYear, astronomerLeft) {
+            const { scale } = chartData.metadata;
+            const yearPosition = scale.baseLeft + (publicationYear - timeRange.start) * scale.pixelsPerYear;
+            return yearPosition - astronomerLeft; // Relative to the astronomer's box
+        }
+
+        // Generate astronomer entries
+        function generateAstronomers() {
+            const container = document.getElementById('astronomers');
+            container.innerHTML = ''; // Clear existing content
+            const rowHeight = 85; // Reduced space between rows
+            const startTop = 70;   // Starting position from top
+            
+            sortedAstronomers.forEach((astronomer, index) => {
+                const { left, width } = calculateAstronomerLayout(astronomer);
+                const top = startTop + (index * rowHeight);
+                
+                const entry = document.createElement('div');
+                entry.className = `astronomer-entry ${chartData.categories[astronomer.category].className}`;
+                entry.style.left = left + 'px';
+                entry.style.top = top + 'px';
+                entry.style.width = width + 'px';
+                
+                entry.innerHTML = `
+                    <div class="astronomer-name">${astronomer.name}</div>
+                    <div class="astronomer-dates">(${astronomer.birthYear}-${astronomer.deathYear})</div>
+                    <div class="book-list" id="publications-${index}">
+                        <!-- Publication markers will be added here -->
+                    </div>
+                `;
+                
+                container.appendChild(entry);
+                
+                // Add publication markers
+                const publicationsContainer = document.getElementById(`publications-${index}`);
+                astronomer.publications.forEach((pub, pubIndex) => {
+                    const markerX = calculatePublicationPosition(pub.year, left);
+                    
+                    // Only show markers for publications within the astronomer's lifespan box
+                    if (markerX >= 0 && markerX <= width) {
+                        const marker = document.createElement('div');
+                        marker.className = 'publication-marker';
+                        marker.style.left = markerX + 'px';
+                        marker.style.top = '15px'; // Adjusted for smaller box
+                        
+                        // Create year label
+                        const yearLabel = document.createElement('div');
+                        yearLabel.className = 'publication-label';
+                        yearLabel.textContent = pub.year;
+                        marker.appendChild(yearLabel);
+                        
+                        // Create title label
+                        const titleLabel = document.createElement('div');
+                        titleLabel.className = 'publication-title-label';
+                        titleLabel.textContent = pub.title;
+                        marker.appendChild(titleLabel);
+                        
+                        // Add different marker styles based on category
+                        switch (astronomer.category) {
+                            case 'observer':
+                                marker.style.background = '#c0392b';
+                                break;
+                            case 'theorist':
+                                marker.style.background = '#2980b9';
+                                break;
+                            case 'popularizer':
+                                marker.style.background = '#27ae60';
+                                break;
+                        }
+                        
+                        publicationsContainer.appendChild(marker);
+                    }
+                });
+            });
+            
+            // Update timeline container height based on number of astronomers
+            const timelineContainer = document.getElementById('timelineContainer');
+            const totalHeight = startTop + (sortedAstronomers.length * rowHeight) + 50;
+            timelineContainer.style.height = totalHeight + 'px';
+            
+            // Update timeline width based on time range
+            const { scale } = chartData.metadata;
+            const timelineWidth = (timeRange.end - timeRange.start) * scale.pixelsPerYear + (scale.baseLeft * 2);
+            timelineContainer.style.width = timelineWidth + 'px';
+        }
+
+        // Generate legend
+        function generateLegend() {
+            const container = document.getElementById('legend');
+            
+            const legendHTML = `
+                <div><strong>Categories:</strong></div>
+                <div style="margin-top: 8px;">
+                    ${Object.entries(chartData.categories).map(([key, category]) => `
+                        <div style="display: flex; align-items: center; margin: 3px 0;">
+                            <div style="width: 20px; height: 3px; background: ${category.color}; margin-right: 8px;"></div>
+                            <span>${category.name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top: 10px; font-size: 10px; color: #8b7355;">
+                    <em>Box width represents lifespan<br>Position shows birth year</em>
+                </div>
+            `;
+            
+            container.innerHTML = legendHTML;
+        }
+
+        // Main render function
+        function renderChart() {
+            console.log('Rendering chart...');
+            // Update title and subtitle
+            document.getElementById('chartTitle').textContent = chartData.metadata.title;
+            document.getElementById('chartSubtitle').textContent = chartData.metadata.subtitle;
+            
+            // Generate all components
+            generateYearMarkers();
+            generateAstronomers();
+            generateLegend();
+            
+            // Show the chart and hide loading message
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('timelineContainer').style.display = 'block';
+            document.getElementById('legend').style.display = 'block';
+            
+            // Add interactivity
+            addInteractivity();
+        }
+
+        // Add interactive features
+        function addInteractivity() {
+            // Add hover effects to astronomer entries
+            document.querySelectorAll('.astronomer-entry').forEach(entry => {
+                entry.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('filtered-out')) {
+                        this.style.transform = 'scale(1.02) translateY(-2px)';
+                    }
+                });
+                
+                entry.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('filtered-out')) {
+                        this.style.transform = 'scale(1) translateY(0)';
+                    }
+                });
+            });
+        }
+
+        // Initialize the chart
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing chart...');
+            loadAstronomyData();
+        });
+
+        // Expose helper functions globally for debugging/extending
+        window.chartHelpers = {
+            getData: () => chartData,
+            getFilters: () => currentFilters,
+            applyFilters,
+            clearAllFilters
+        };
+    </script>
+</body>
+</html>
